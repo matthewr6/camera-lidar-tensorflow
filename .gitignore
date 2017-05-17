@@ -1,0 +1,4 @@
+*.bag
+*.avi
+models/*
+*.pyc
