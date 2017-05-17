@@ -10,7 +10,7 @@ verbose_batch = False
 very_verbose_batch = False
 
 def open_file(f):
-    with open('{}.json'.format(f), 'wb') as out:
+    with open('{}.json'.format(f), 'rb') as out:
         return json.load(out)
 
 print 'opening files'
