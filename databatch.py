@@ -37,7 +37,7 @@ def shuffle_data(features, targets):
     return zip(*zipped)
 
 max_batch_size = len(data['ackermann'].keys())
-def batch(batch_size):
+def batch(batch_size, mode='both'):
     batch_size = min(max_batch_size, batch_size)
     targets = []
     features = []
@@ -50,9 +50,9 @@ def batch(batch_size):
             rel_idx = float(second_idx)/item_count
             laser_single = get_relatived_value(data['laser'][time], rel_idx)
             targets.append([value])
-            if laser_only:
+            if mode == 'laser':
                 features.append(laser_single)
-            elif camera_only:
+            elif mode == 'camera':
                 features.append(get_relatived_value(data['camera'][time], rel_idx))
             else:
                 camera_single = get_relatived_value(data['camera'][time], rel_idx)

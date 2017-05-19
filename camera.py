@@ -42,12 +42,18 @@ def conv_net(x, weights, biases, dropout):
 
     # Convolution Layer
     conv1 = conv2d(x, weights['wc1'], biases['bc1'])
-    # print conv1.get_shape()
+    print conv1.get_shape()
     # Max Pooling (down-sampling)
     conv1 = maxpool2d(conv1, k=2)
-    # print conv1.get_shape()
+    print conv1.get_shape()
 
-    fc1 = tf.reshape(conv1, [-1, weights['fc'].get_shape().as_list()[0]])
+    conv2 = conv2d(conv1, weights['wc2'], biases['bc2'])
+    print conv2.get_shape()
+    conv2 = maxpool2d(conv2, k=2)
+    print conv2.get_shape()
+
+    print weights['fc'].get_shape().as_list()[0]
+    fc1 = tf.reshape(conv2, [-1, weights['fc'].get_shape().as_list()[0]])
     fc1 = tf.add(tf.matmul(fc1, weights['fc']), biases['fc'])
     fc1 = tf.nn.relu(fc1)
     # Apply Dropout
@@ -60,18 +66,20 @@ def conv_net(x, weights, biases, dropout):
 # Store layers weight & bias
 conv_size = 10
 l1_size = 32
-full_size = 128
+l2_size = 64
+full_size = 64
 weights = {
     # 1 input, 32 outputs
     'wc1': tf.Variable(tf.random_normal([conv_size, conv_size, 1, l1_size])),
-    # fully connected, IDK inputs - how did it get 2178, 1024 outputs
-    'fc': tf.Variable(tf.random_normal([32*18 * l1_size, full_size])),
+    'wc2': tf.Variable(tf.random_normal([conv_size, conv_size, l1_size, l2_size])),
+    'fc': tf.Variable(tf.random_normal([4*4 * l1_size, full_size])),
     # full_size inputs, 1 output
     'out': tf.Variable(tf.random_normal([full_size, n_output]))
 }
 
 biases = {
     'bc1': tf.Variable(tf.random_normal([l1_size])),
+    'bc2': tf.Variable(tf.random_normal([l2_size])),
     'fc': tf.Variable(tf.random_normal([full_size])),
     'out': tf.Variable(tf.random_normal([n_output]))
 }
@@ -91,29 +99,36 @@ print 'init created'
 
 max_rate = 1
 min_rate = 0.001
-def get_learning_rate(last_loss):
+def get_learning_rate(last_loss, past_losses):
     if last_loss is None:
         return 1
     rate = min(last_loss/1000.0, max_rate)
+    # if len(past_losses) == loss_history and np.std(past_losses) <= 0.1:
+    #     rate = rate * 10.0
     return max(rate, min_rate)
 
 last_loss = None
 saver = tf.train.Saver()
 save_step = 10
+past_losses = []
+loss_history = 5
 with tf.Session() as sess:
     print 'initializing'
     sess.run(init)
     print 'session launched'
     for step in range(training_iters):
-        features, targets = batch(batch_size)
+        features, targets = batch(batch_size, mode='camera')
         sess.run(optimizer, feed_dict={x: features, y: targets,
                                        keep_prob: dropout,
-                                       learning_rate: get_learning_rate(last_loss)})
+                                       learning_rate: get_learning_rate(last_loss, past_losses)})
         if step % display_step == 0:
             loss = sess.run(cost, feed_dict={x: features,
                                              y: targets,
                                              keep_prob: 1.})
             last_loss = loss
+            # past_losses.append(loss)
+            # if len(past_losses) > loss_history:
+            #     past_losses = past_losses[1:]
             print("Iter {}, Minibatch Loss={}".format(step, loss))
         if step % save_step == 0:
             saver.save(sess, 'models/camera.ckpt')
