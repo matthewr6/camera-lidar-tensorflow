@@ -2,3 +2,4 @@
 *.avi
 models/*
 *.pyc
+normalized_data/*
