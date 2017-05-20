@@ -7,7 +7,7 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 1000
+training_iters = 50000
 batch_size = 5
 display_step = 1
 
@@ -61,7 +61,7 @@ def conv_net(x, weights, biases, dropout):
 # Store layers weight & bias
 conv_size = 4   
 l1_size = 64
-full_size = 128
+full_size = 256
 weights = {
     # 1 input, 32 outputs
     'wc1': tf.Variable(tf.random_normal([conv_size, 1, l1_size])),
@@ -94,7 +94,7 @@ min_rate = 0.001
 def get_learning_rate(last_loss, past_losses):
     if last_loss is None:
         return 1
-    rate = min(last_loss/1000.0, max_rate)
+    rate = min(last_loss/100.0, max_rate)
     # if len(past_losses) == loss_history and np.std(past_losses) <= 0.1:
     #     rate = rate * 10.0
     return max(rate, min_rate)
