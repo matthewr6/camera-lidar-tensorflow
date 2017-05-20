@@ -56,9 +56,11 @@ def batch(batch_size, mode='both'):
                 features.append(get_relatived_value(data['camera'][time], rel_idx))
             else:
                 camera_single = get_relatived_value(data['camera'][time], rel_idx)
-                features.append(camera_single + laser_single)
+                features.append([camera_single, laser_single])
         if verbose_batch and very_verbose_batch:
             print 'batch prep percent', float(idx)/batch_size
     if verbose_batch:
         'returning batch size={}'.format(batch_size)
+    if mode == 'both':
+        features = zip(*features)
     return (features, targets)
