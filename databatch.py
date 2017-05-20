@@ -15,9 +15,9 @@ def open_file(f):
 
 print 'opening files'
 data = {}
-data['laser'] = open_file('dict_data/laser')
-data['ackermann'] = open_file('dict_data/ackermann')
-data['camera'] = open_file('dict_data/camera')
+data['laser'] = open_file('normalized_data/laser')
+data['ackermann'] = open_file('normalized_data/ackermann')
+data['camera'] = open_file('normalized_data/camera')
 print 'files opened'
 
 # let's use ackermann data as the base and fill in from there by weighted averaging of camera and laser info
