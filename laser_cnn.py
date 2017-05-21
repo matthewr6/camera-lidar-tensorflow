@@ -7,7 +7,7 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 50000
+training_iters = 5000
 batch_size = 5
 display_step = 1
 
@@ -59,8 +59,8 @@ def conv_net(x, weights, biases, dropout):
     return out
 
 # Store layers weight & bias
-conv_size = 4   
-l1_size = 64
+conv_size = 4 
+l1_size = 12
 full_size = 256
 weights = {
     # 1 input, 32 outputs
@@ -89,11 +89,11 @@ print 'optimizer created'
 init = tf.global_variables_initializer()
 print 'init created'
 
-max_rate = 1
-min_rate = 0.001
+max_rate = 1.0
+min_rate = 0.0
 def get_learning_rate(last_loss, past_losses):
     if last_loss is None:
-        return 1
+        return 1.0
     rate = min(last_loss/100.0, max_rate)
     # if len(past_losses) == loss_history and np.std(past_losses) <= 0.1:
     #     rate = rate * 10.0
@@ -104,6 +104,8 @@ saver = tf.train.Saver()
 save_step = 10
 past_losses = []
 loss_history = 5
+lowest_loss = 1000.0
+lowest_iter = 0
 with tf.Session() as sess:
     print 'initializing'
     sess.run(init)
@@ -118,9 +120,14 @@ with tf.Session() as sess:
                                              y: targets,
                                              keep_prob: 1.})
             last_loss = loss
+            lowest_loss = min(lowest_loss, loss)
+            if lowest_loss == loss:
+                lowest_iter = step
             # past_losses.append(loss)
             # if len(past_losses) > loss_history:
             #     past_losses = past_losses[1:]
             print("Iter {}, Minibatch Loss={}".format(step, loss))
         if step % save_step == 0:
             saver.save(sess, 'models/laser_cnn.ckpt')
+
+print lowest_iter, lowest_loss
