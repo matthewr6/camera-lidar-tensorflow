@@ -7,11 +7,11 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 5000
+training_iters = 10000
 batch_size = 5
 display_step = 1
 
-n_input = 542
+n_input = 271
 n_output = 1
 dropout = 0.75
 
@@ -22,7 +22,7 @@ keep_prob = tf.placeholder(tf.float32) #dropout (keep probability)
 
 
 # Create some wrappers for simplicity
-def conv1d(x, W, b, stride=4):
+def conv1d(x, W, b, stride=1):
     # Conv2D wrapper, with bias and relu activation
     x = tf.nn.conv1d(x, W, stride=stride, padding='SAME')
     x = tf.nn.bias_add(x, b)
@@ -38,7 +38,7 @@ def conv1d(x, W, b, stride=4):
 # Create model
 def conv_net(x, weights, biases, dropout):
     # Reshape input picture
-    x = tf.reshape(x, shape=[-1, 542, 1])
+    x = tf.reshape(x, shape=[-1, 271, 1])
 
     # Convolution Layer
     conv1 = conv1d(x, weights['wc1'], biases['bc1'])
@@ -47,32 +47,39 @@ def conv_net(x, weights, biases, dropout):
     # conv1 = maxpool2d(conv1, k=2)
     # print conv1.get_shape()
 
-    print weights['fc'].get_shape().as_list()[0]
-    fc1 = tf.reshape(conv1, [-1, weights['fc'].get_shape().as_list()[0]])
-    fc1 = tf.add(tf.matmul(fc1, weights['fc']), biases['fc'])
+    fc1 = tf.reshape(conv1, [-1, weights['fc1'].get_shape().as_list()[0]])
+    fc1 = tf.add(tf.matmul(fc1, weights['fc1']), biases['fc1'])
     fc1 = tf.nn.relu(fc1)
-    # Apply Dropout
+    # Apply Dropout?
     fc1 = tf.nn.dropout(fc1, dropout)
 
+    fc2 = tf.add(tf.matmul(fc1, weights['fc2']), biases['fc2'])
+    fc2 = tf.nn.relu(fc2)
+
     # Output, class prediction
-    out = tf.add(tf.matmul(fc1, weights['out']), biases['out'])
+    out = tf.add(tf.matmul(fc2, weights['out']), biases['out'])
     return out
 
 # Store layers weight & bias
-conv_size = 4 
-l1_size = 12
-full_size = 256
+# add more layers
+# two middle layers
+conv_size = 5
+l1_size = 24
+full_size_1 = 256
+full_size_2 = 256
 weights = {
     # 1 input, 32 outputs
     'wc1': tf.Variable(tf.random_normal([conv_size, 1, l1_size])),
-    'fc': tf.Variable(tf.random_normal([136 * l1_size, full_size])),
+    'fc1': tf.Variable(tf.random_normal([271 * l1_size, full_size_1])),
+    'fc2': tf.Variable(tf.random_normal([full_size_1, full_size_2])),
     # full_size inputs, 1 output
-    'out': tf.Variable(tf.random_normal([full_size, n_output]))
+    'out': tf.Variable(tf.random_normal([full_size_2, n_output]))
 }
 
 biases = {
     'bc1': tf.Variable(tf.random_normal([l1_size])),
-    'fc': tf.Variable(tf.random_normal([full_size])),
+    'fc1': tf.Variable(tf.random_normal([full_size_1])),
+    'fc2': tf.Variable(tf.random_normal([full_size_2])),
     'out': tf.Variable(tf.random_normal([n_output]))
 }
 
@@ -94,7 +101,7 @@ min_rate = 0.0
 def get_learning_rate(last_loss, past_losses):
     if last_loss is None:
         return 1.0
-    rate = min(last_loss/100.0, max_rate)
+    rate = min(last_loss/1000.0, max_rate)
     # if len(past_losses) == loss_history and np.std(past_losses) <= 0.1:
     #     rate = rate * 10.0
     return max(rate, min_rate)

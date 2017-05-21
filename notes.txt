@@ -1,0 +1,2 @@
+laser-cnn
+run 1: lowest 0.0001 at epoch 3320

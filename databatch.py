@@ -37,6 +37,7 @@ def shuffle_data(features, targets):
     return zip(*zipped)
 
 max_batch_size = len(data['ackermann'].keys())
+laser_length = 271
 def batch(batch_size, mode='both'):
     batch_size = min(max_batch_size, batch_size)
     targets = []
@@ -48,7 +49,7 @@ def batch(batch_size, mode='both'):
             continue
         for second_idx, value in enumerate(data['ackermann'][time]):
             rel_idx = float(second_idx)/item_count
-            laser_single = get_relatived_value(data['laser'][time], rel_idx)
+            laser_single = get_relatived_value(data['laser'][time], rel_idx)[:laser_length]
             targets.append([value])
             if mode == 'laser':
                 features.append(laser_single)
