@@ -3,3 +3,4 @@
 models/*
 *.pyc
 normalized_data/*
+losses_*

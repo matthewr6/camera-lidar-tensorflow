@@ -16,7 +16,7 @@ def open_file(f):
 print 'opening files'
 data = {}
 data['laser'] = open_file('normalized_data/laser')
-data['ackermann'] = open_file('normalized_data/ackermann')
+data['ackermann'] = open_file('normalized_data/ackermann_v2')
 data['camera'] = open_file('normalized_data/camera')
 print 'files opened'
 
