@@ -16,7 +16,8 @@ def open_file(f):
 print 'opening files'
 data = {}
 data['laser'] = open_file('normalized_data/laser')
-data['ackermann'] = open_file('normalized_data/ackermann_v2')
+data['ackermann_v2'] = open_file('normalized_data/ackermann_v2')
+data['ackermann'] = open_file('normalized_data/ackermann')
 data['camera'] = open_file('normalized_data/camera')
 print 'files opened'
 
@@ -38,16 +39,19 @@ def shuffle_data(features, targets):
 
 max_batch_size = len(data['ackermann'].keys())
 laser_length = 271
-def batch(batch_size, mode='both'):
+def batch(batch_size, mode='both', old=False):
+    ackermann_string = 'ackermann_v2'
+    if old:
+        ackermann_string = 'ackermann'
     batch_size = min(max_batch_size, batch_size)
     targets = []
     features = []
-    times = random.sample(data['ackermann'].keys(), batch_size)
+    times = random.sample(data[ackermann_string].keys(), batch_size)
     for idx, time in enumerate(times):
-        item_count = len(data['ackermann'][time])
+        item_count = len(data[ackermann_string][time])
         if time not in data['laser'] or time not in data['camera']:
             continue
-        for second_idx, value in enumerate(data['ackermann'][time]):
+        for second_idx, value in enumerate(data[ackermann_string][time]):
             rel_idx = float(second_idx)/item_count
             laser_single = get_relatived_value(data['laser'][time], rel_idx)[:laser_length]
             targets.append([value])
