@@ -9,7 +9,7 @@ from databatch import batch
 import tensorflow as tf
 
 training_iters = 500
-batch_size = 10
+batch_size = 15
 display_step = 1
 
 n_input = 271
@@ -39,45 +39,51 @@ def conv1d(x, W, b, stride=1):
 # Create model
 def conv_net(x, weights, biases, dropout):
     # Reshape input picture
-    x = tf.reshape(x, shape=[-1, 271, 1])
+    out = tf.reshape(x, shape=[-1, 271, 1])
 
     # Convolution Layer
-    conv1 = conv1d(x, weights['wc1'], biases['bc1'])
-    print conv1.get_shape()
+    out = conv1d(out, weights['wc1'], biases['bc1'])
+    # print conv1.get_shape()
     # Max Pooling (down-sampling)
     # conv1 = maxpool2d(conv1, k=2)
-    # conv2 = conv1d(conv1, weights['wc2'], biases['bc2'])
-    # print conv1.get_shape()
+    # conv1 = conv1d(conv1, weights['wc2'], biases['bc2'])
 
-    fc1 = tf.reshape(conv1, [-1, weights['fc1'].get_shape().as_list()[0]])
-    fc1 = tf.add(tf.matmul(fc1, weights['fc1']), biases['fc1'])
-    fc1 = tf.nn.relu(fc1)
+    out = tf.reshape(out, [-1, weights['fc1'].get_shape().as_list()[0]])
+    out = tf.add(tf.matmul(out, weights['fc1']), biases['fc1'])
+    out = tf.nn.relu(out)
     # Apply Dropout?
     # fc1 = tf.nn.dropout(fc1, dropout)
 
-    fc2 = tf.add(tf.matmul(fc1, weights['fc2']), biases['fc2'])
-    fc2 = tf.nn.relu(fc2)
+    out = tf.add(tf.matmul(out, weights['fc2']), biases['fc2'])
+    out = tf.nn.relu(out)
+
+    # out = tf.add(tf.matmul(out, weights['fc3']), biases['fc3'])
+    # out = tf.nn.relu(out)
 
     # Output, class prediction
-    out = tf.add(tf.matmul(fc2, weights['out']), biases['out'])
+    out = tf.add(tf.matmul(out, weights['out']), biases['out'])
     return out
 
 # Store layers weight & bias
 # add more layers
 # two middle layers
-conv_size = 4
-l1_size = 24
-l2_size = 24
-full_size_1 = 32
-full_size_2 = 16
+conv1_size = 4
+conv2_size = 4
+l1_size = 36
+l2_size = l1_size
+full_size_1 = 64
+full_size_2 = 32
+full_size_3 = 32
 weights = {
-    # 1 input, 32 outputs
-    'wc1': tf.Variable(tf.random_normal([conv_size, 1, l1_size])),
-    'wc2': tf.Variable(tf.random_normal([conv_size, l1_size, l2_size])),
-    'fc1': tf.Variable(tf.random_normal([271 * l1_size, full_size_1])),
+
+    'wc1': tf.Variable(tf.random_normal([conv1_size, 1, l1_size])),
+    'wc2': tf.Variable(tf.random_normal([conv2_size, l1_size, l2_size])),
+
+    'fc1': tf.Variable(tf.random_normal([271 * l2_size, full_size_1])),
     'fc2': tf.Variable(tf.random_normal([full_size_1, full_size_2])),
-    # full_size inputs, 1 output
-    'out': tf.Variable(tf.random_normal([full_size_2, n_output]))
+    'fc3': tf.Variable(tf.random_normal([full_size_2, full_size_3])),
+
+    'out': tf.Variable(tf.random_normal([full_size_3, n_output]))
 }
 
 biases = {
@@ -85,6 +91,7 @@ biases = {
     'bc2': tf.Variable(tf.random_normal([l2_size])),
     'fc1': tf.Variable(tf.random_normal([full_size_1])),
     'fc2': tf.Variable(tf.random_normal([full_size_2])),
+    'fc3': tf.Variable(tf.random_normal([full_size_3])),
     'out': tf.Variable(tf.random_normal([n_output]))
 }
 
