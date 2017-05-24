@@ -8,7 +8,7 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 50
+training_iters = 10000
 batch_size = 10
 display_step = 1
 
@@ -96,7 +96,7 @@ print 'init created'
 max_rate = 1.0
 min_rate = 0.0
 def get_learning_rate(last_loss):
-    # return 0.0001
+    return 0.001
     if last_loss is None:
         return 1.0
     rate = min(last_loss/10000.0, max_rate)
