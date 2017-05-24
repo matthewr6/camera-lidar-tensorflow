@@ -69,3 +69,8 @@ def batch(batch_size, mode='both', laser_cdf=True):
     if mode == 'both':
         features = zip(*features)
     return (features, targets)
+
+# always pick previous or next?  probably next, but actually...
+
+# make changes one at a time
+# average steering values instead of laser values - and average future steering values

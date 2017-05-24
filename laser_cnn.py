@@ -8,7 +8,7 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 500
+training_iters = 50
 batch_size = 10
 display_step = 1
 
