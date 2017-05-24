@@ -39,9 +39,9 @@ def shuffle_data(features, targets):
 
 max_batch_size = len(data['ackermann'].keys())
 laser_length = 271
-def batch(batch_size, mode='both', old=False):
+def batch(batch_size, mode='both', laser_cdf=True):
     ackermann_string = 'ackermann_v2'
-    if old:
+    if not laser_cdf:
         ackermann_string = 'ackermann'
     batch_size = min(max_batch_size, batch_size)
     targets = []
