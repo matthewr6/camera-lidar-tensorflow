@@ -5,3 +5,4 @@ models/*
 normalized_data/*
 losses_*
 *.json
+*.png

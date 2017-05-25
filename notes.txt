@@ -1,2 +1,9 @@
-laser-cnn
-run 1: lowest 0.0001 at epoch 3320
+2.5 seconds?  decay to 5?
+
+linear decay
+
+first time - 50/50
+last - 1/50
+
+laser is ~14.705 per second
+ackermann is ~29.076 per second

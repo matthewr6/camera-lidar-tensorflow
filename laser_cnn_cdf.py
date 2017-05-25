@@ -52,7 +52,7 @@ def conv_net(x, weights, biases, dropout):
     out = tf.add(tf.matmul(out, weights['fc1']), biases['fc1'])
     out = tf.nn.relu(out)
     # Apply Dropout?
-    # fc1 = tf.nn.dropout(fc1, dropout)
+    out = tf.nn.dropout(out, dropout)
 
     out = tf.add(tf.matmul(out, weights['fc2']), biases['fc2'])
     out = tf.nn.relu(out)
@@ -157,7 +157,7 @@ with tf.Session() as sess:
         #     saver.save(sess, 'models/laser_cnn.ckpt')
     print 'creating whole prediction set...'
     features, targets = batch(1000000)
-    predictions = sess.run(pred, feed_dict={x: features})
+    predictions = sess.run(pred, feed_dict={x: features, keep_prob: dropout})
     targets = [t[0]/(100) for t in targets]
     predictions = [float(p[0])/100.0 for p in predictions]
     combined = zip(targets, predictions)

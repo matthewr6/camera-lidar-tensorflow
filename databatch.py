@@ -20,7 +20,7 @@ data['laser'] = flatten(open_file('normalized_data/laser'))
 data['ackermann'] = flatten(open_file('normalized_data/ackermann_v2'))
 print 'files opened'
 
-def next_x_values(arr, initial_idx, x=5):
+def next_x_values(arr, initial_idx, x=30):
     # if initial_idx == len(arr):
     #     return [arr[initial_idx-1]]
     ret = [arr[initial_idx]]
