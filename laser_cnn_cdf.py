@@ -9,8 +9,8 @@ from databatch import batch
 import tensorflow as tf
 
 training_iters = 10000
-batch_size = 15
-display_step = 1
+batch_size = 50
+display_step = 100
 
 n_input = 271
 n_output = 1
@@ -134,29 +134,29 @@ with tf.Session() as sess:
     sess.run(init)
     print 'session launched'
     for step in range(training_iters):
-        features, targets = batch(batch_size, mode='laser')
+        features, targets = batch(batch_size)
         sess.run(optimizer, feed_dict={x: features, y: targets,
                                        keep_prob: dropout,
                                        learning_rate: get_learning_rate(last_loss, past_losses)})
+        loss = sess.run(cost, feed_dict={x: features,
+                                         y: targets,
+                                         keep_prob: 1.})
+        last_loss = loss
+        lowest_loss = min(lowest_loss, loss)
+        if lowest_loss == loss:
+            lowest_iter = step
+        # past_losses.append(loss)
+        # if len(past_losses) > loss_history:
+        #     past_losses = past_losses[1:]
         if step % display_step == 0:
-            loss = sess.run(cost, feed_dict={x: features,
-                                             y: targets,
-                                             keep_prob: 1.})
-            last_loss = loss
-            lowest_loss = min(lowest_loss, loss)
-            if lowest_loss == loss:
-                lowest_iter = step
-            # past_losses.append(loss)
-            # if len(past_losses) > loss_history:
-            #     past_losses = past_losses[1:]
             print("Iter {}, Minibatch avg error={}".format(step, np.sqrt(loss/(ackermann_scale**2.0))))
-            # print("Iter {}, Minibatch avg error={}".format(step, loss))
-            loss_history.append(np.sqrt(loss/(ackermann_scale**2.0)))
-            # loss_history.append(loss)
-        if step % save_step == 0:
-            saver.save(sess, 'models/laser_cnn.ckpt')
+        # print("Iter {}, Minibatch avg error={}".format(step, loss))
+        loss_history.append(np.sqrt(loss/(ackermann_scale**2.0)))
+        # loss_history.append(loss)
+        # if step % save_step == 0:
+        #     saver.save(sess, 'models/laser_cnn.ckpt')
     print 'creating whole prediction set...'
-    features, targets = batch(1000000, mode='laser')
+    features, targets = batch(1000000)
     predictions = sess.run(pred, feed_dict={x: features})
     targets = [t[0]/(100) for t in targets]
     predictions = [float(p[0])/100.0 for p in predictions]
