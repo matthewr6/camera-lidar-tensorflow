@@ -8,13 +8,13 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 10000
+training_iters = 50000
 batch_size = 50
 display_step = 100
 
 n_input = 271
 n_output = 1
-dropout = 0.75
+dropout = 0.9
 
 
 x = tf.placeholder(tf.float32, [None, n_input])
@@ -161,7 +161,7 @@ with tf.Session() as sess:
     targets = [t[0]/(100) for t in targets]
     predictions = [float(p[0])/100.0 for p in predictions]
     combined = zip(targets, predictions)
-    with open('laser_cnn_cdf_pred.json', 'wb') as f:
+    with open('visualizations/laser_cnn_cdf_pred.json', 'wb') as f:
         json.dump(combined, f, indent=4)
 
 # print lowest_iter, lowest_loss/(ackermann_scale**2.0)
