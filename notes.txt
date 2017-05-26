@@ -7,3 +7,10 @@ last - 1/50
 
 laser is ~14.705 per second
 ackermann is ~29.076 per second
+
+~110000 iterations for error under 0.1
+150000
+175000
+220000
+
+concerns of overfitting?
