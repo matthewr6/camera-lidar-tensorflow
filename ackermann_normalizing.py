@@ -47,6 +47,8 @@ epsilon = 1e-9
 def denormalize(value):
     if value >= 1:
         value = 1-epsilon
+    if value <= 0:
+        value = epsilon
     return get_relatived_value(x, value)
 
 if __name__ == '__main__':

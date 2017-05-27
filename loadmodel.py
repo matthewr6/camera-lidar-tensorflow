@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from databatch import batch
+from ackermann_normalizing import denormalize
 
 import tensorflow as tf
 
@@ -29,7 +30,6 @@ def conv_net(x, weights, biases, dropout):
     # Convolution Layer
     out = conv1d(out, weights['wc1'], biases['bc1'])
     out = conv1d(out, weights['wc2'], biases['bc2'])
-    # out = conv1d(out, weights['wc2'], biases['bc2'])
 
     out = tf.reshape(out, [-1, weights['fc1'].get_shape().as_list()[0]])
     out = tf.add(tf.matmul(out, weights['fc1']), biases['fc1'])
@@ -42,9 +42,6 @@ def conv_net(x, weights, biases, dropout):
     out = tf.add(tf.matmul(out, weights['out']), biases['out'])
     return out
 
-# Store layers weight & bias
-# add more layers
-# two middle layers
 conv1_size = 7
 conv2_size = 7
 l1_size = 24
