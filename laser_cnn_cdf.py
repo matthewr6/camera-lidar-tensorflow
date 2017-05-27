@@ -8,13 +8,13 @@ from databatch import batch
 
 import tensorflow as tf
 
-training_iters = 50000
-batch_size = 50
+training_iters = 554500
+batch_size = 15
 display_step = 100
 
 n_input = 271
 n_output = 1
-dropout = 0.9
+dropout = 1.0
 
 
 x = tf.placeholder(tf.float32, [None, n_input])
@@ -27,7 +27,8 @@ def conv1d(x, W, b, stride=1):
     # Conv2D wrapper, with bias and relu activation
     x = tf.nn.conv1d(x, W, stride=stride, padding='SAME')
     x = tf.nn.bias_add(x, b)
-    return tf.nn.relu(x)
+    return tf.nn.elu(x)
+    # return tf.nn.dropout(x, .85, noise_shape=None, seed=None, name=None)
 
 # will I need maxpooling?
 # def maxpool2d(x, k=2):
@@ -43,22 +44,15 @@ def conv_net(x, weights, biases, dropout):
 
     # Convolution Layer
     out = conv1d(out, weights['wc1'], biases['bc1'])
-    # print conv1.get_shape()
-    # Max Pooling (down-sampling)
-    # conv1 = maxpool2d(conv1, k=2)
-    # conv1 = conv1d(conv1, weights['wc2'], biases['bc2'])
+    out = conv1d(out, weights['wc2'], biases['bc2'])
+    # out = conv1d(out, weights['wc2'], biases['bc2'])
 
     out = tf.reshape(out, [-1, weights['fc1'].get_shape().as_list()[0]])
     out = tf.add(tf.matmul(out, weights['fc1']), biases['fc1'])
-    out = tf.nn.relu(out)
-    # Apply Dropout?
-    out = tf.nn.dropout(out, dropout)
+    out = tf.nn.elu(out)
 
     out = tf.add(tf.matmul(out, weights['fc2']), biases['fc2'])
-    out = tf.nn.relu(out)
-
-    # out = tf.add(tf.matmul(out, weights['fc3']), biases['fc3'])
-    # out = tf.nn.relu(out)
+    out = tf.nn.elu(out)
 
     # Output, class prediction
     out = tf.add(tf.matmul(out, weights['out']), biases['out'])
@@ -67,8 +61,8 @@ def conv_net(x, weights, biases, dropout):
 # Store layers weight & bias
 # add more layers
 # two middle layers
-conv1_size = 5
-conv2_size = 5
+conv1_size = 7
+conv2_size = 7
 l1_size = 24
 l2_size = l1_size
 full_size_1 = 64
@@ -111,18 +105,11 @@ print 'init created'
 max_rate = 1.0
 min_rate = 0.0
 ackermann_scale = 100.0
-def get_learning_rate(last_loss, past_losses):
+def get_learning_rate():
     return 0.001
-    if last_loss is None:
-        return 1.0
-    rate = min(last_loss/10000.0, max_rate)
-    # if len(past_losses) == loss_history and np.std(past_losses) <= 0.1:
-    #     rate = rate * 10.0
-    return max(rate, min_rate)
-
 last_loss = None
 saver = tf.train.Saver()
-save_step = 10
+save_step = 100
 past_losses = []
 loss_history = 5
 lowest_loss = 1000.0
@@ -137,35 +124,22 @@ with tf.Session() as sess:
         features, targets = batch(batch_size)
         sess.run(optimizer, feed_dict={x: features, y: targets,
                                        keep_prob: dropout,
-                                       learning_rate: get_learning_rate(last_loss, past_losses)})
-        loss = sess.run(cost, feed_dict={x: features,
-                                         y: targets,
-                                         keep_prob: 1.})
-        last_loss = loss
-        lowest_loss = min(lowest_loss, loss)
-        if lowest_loss == loss:
-            lowest_iter = step
-        # past_losses.append(loss)
-        # if len(past_losses) > loss_history:
-        #     past_losses = past_losses[1:]
+                                       learning_rate: get_learning_rate()})
         if step % display_step == 0:
+            loss = sess.run(cost, feed_dict={x: features,
+                                             y: targets,
+                                             keep_prob: 1.})
             print("Iter {}, Minibatch avg error={}".format(step, np.sqrt(loss/(ackermann_scale**2.0))))
-        # print("Iter {}, Minibatch avg error={}".format(step, loss))
-        loss_history.append(np.sqrt(loss/(ackermann_scale**2.0)))
-        # loss_history.append(loss)
-        # if step % save_step == 0:
-        #     saver.save(sess, 'models/laser_cnn.ckpt')
-    print 'creating whole prediction set...'
-    features, targets = batch(1000000)
-    predictions = sess.run(pred, feed_dict={x: features, keep_prob: dropout})
-    targets = [t[0]/(100) for t in targets]
-    predictions = [float(p[0])/100.0 for p in predictions]
-    combined = zip(targets, predictions)
-    with open('visualizations/laser_cnn_cdf_pred.json', 'wb') as f:
-        json.dump(combined, f, indent=4)
+            loss_history.append(np.sqrt(loss/(ackermann_scale**2.0)))
+        if step % save_step == 0:
+            saver.save(sess, 'models/low_future_laser_cnn.ckpt')
 
-# print lowest_iter, lowest_loss/(ackermann_scale**2.0)
-
-if sys.argv[1]:
-    with open('losses_{}.json'.format(sys.argv[1]), 'wb') as f:
-        json.dump(loss_history, f)
+        if (step % save_step) == 0:
+            print 'creating whole prediction set...'
+            features, targets = batch(1000000)
+            predictions = sess.run(pred, feed_dict={x: features})
+            targets = [t[0]/(100) for t in targets]
+            predictions = [float(p[0])/100.0 for p in predictions]
+            combined = zip(targets, predictions)
+            with open('low_future_laser_cnn_cdf_pred.json', 'wb') as f:
+                json.dump(combined, f, indent=4)

@@ -20,9 +20,7 @@ data['laser'] = flatten(open_file('normalized_data/laser'))
 data['ackermann'] = flatten(open_file('normalized_data/ackermann_v2'))
 print 'files opened'
 
-def next_x_values(arr, initial_idx, x=15):
-    # if initial_idx == len(arr):
-    #     return [arr[initial_idx-1]]
+def next_x_values(arr, initial_idx, x=10):
     ret = [arr[initial_idx]]
     i = 1
     while len(arr)-1 > initial_idx and i < x:
@@ -45,7 +43,6 @@ def batch(batch_size):
 
         rel_idx = float(idx)/laser_datapoints
 
-        # should this be floor?
         ackermann_idx = int(math.ceil(rel_idx * ackermann_datapoints))
 
         next_values = next_x_values(data['ackermann'], ackermann_idx)
@@ -55,8 +52,3 @@ def batch(batch_size):
 
         features.append(laser_single)
     return (features, targets)
-
-# always pick previous or next?  probably next, but actually...
-
-# make changes one at a time
-# average steering values instead of laser values - and average future steering values

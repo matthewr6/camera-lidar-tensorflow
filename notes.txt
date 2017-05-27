@@ -14,3 +14,6 @@ ackermann is ~29.076 per second
 220000
 
 concerns of overfitting?
+
+removing third convolution layer?
+apparently faster training and still as accurate
