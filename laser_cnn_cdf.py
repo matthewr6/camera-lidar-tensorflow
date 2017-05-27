@@ -95,7 +95,7 @@ pred = conv_net(x, weights, biases, keep_prob)
 print 'model constructed'
 
 cost = tf.reduce_mean(tf.squared_difference(pred, y))
-learning_rate = tf.placeholder(tf.float32, shape=[])
+learning_rate = 0.001
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 print 'optimizer created'
 
@@ -105,8 +105,6 @@ print 'init created'
 max_rate = 1.0
 min_rate = 0.0
 ackermann_scale = 100.0
-def get_learning_rate():
-    return 0.001
 last_loss = None
 saver = tf.train.Saver()
 save_step = 100
@@ -123,8 +121,7 @@ with tf.Session() as sess:
     for step in range(training_iters):
         features, targets = batch(batch_size)
         sess.run(optimizer, feed_dict={x: features, y: targets,
-                                       keep_prob: dropout,
-                                       learning_rate: get_learning_rate()})
+                                       keep_prob: dropout})
         if step % display_step == 0:
             loss = sess.run(cost, feed_dict={x: features,
                                              y: targets,
