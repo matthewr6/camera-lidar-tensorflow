@@ -23,3 +23,13 @@
 
 - `python confusion_matrix test_cdf_pred.json`
 	- should be linear
+
+
+### Numbers that are OK to change
+
+##### In `laser_cnn_cdf.py`
+
+- batch_size (15+ is ideal)
+- conv1_size, conv2_size (4-8 is ideal)
+- l1_size (>24 is ideal)
+- All three full_size_x variables (>32 ideal, full_size_3 must equal full_size_2)
