@@ -33,3 +33,9 @@
 - conv1_size, conv2_size (4-8 is ideal)
 - l1_size (>24 is ideal)
 - All three full_size_x variables (>32 ideal, full_size_3 must equal full_size_2)
+- Changing `batch(batch_size)` to `batch(batch_size, x=z)`
+	- z is 10 by default, change this to be higher if you're going faster and lower if you're going slower as a general rule
+
+##### In `auto_steering.py` (in ieee-avc)
+
+- msg.drive.speed (probably around 0.75 - make it similar to how fast you were driving)
