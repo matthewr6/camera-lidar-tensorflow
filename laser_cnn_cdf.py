@@ -129,7 +129,7 @@ with tf.Session() as sess:
             print("Iter {}, Minibatch avg error={}".format(step, np.sqrt(loss/(ackermann_scale**2.0))))
             loss_history.append(np.sqrt(loss/(ackermann_scale**2.0)))
         if step % save_step == 0:
-            saver.save(sess, 'models/low_future_laser_cnn.ckpt')
+            saver.save(sess, 'models/test.ckpt')
 
         if (step % save_step) == 0:
             print 'creating whole prediction set...'
@@ -138,5 +138,5 @@ with tf.Session() as sess:
             targets = [t[0]/(100) for t in targets]
             predictions = [float(p[0])/100.0 for p in predictions]
             combined = zip(targets, predictions)
-            with open('low_future_laser_cnn_cdf_pred.json', 'wb') as f:
+            with open('test_cdf_pred.json', 'wb') as f:
                 json.dump(combined, f, indent=4)

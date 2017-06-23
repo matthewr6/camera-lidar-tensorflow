@@ -17,3 +17,22 @@ concerns of overfitting?
 
 removing third convolution layer?
 apparently faster training and still as accurate
+
+syncing clocks:
+- `sudo service ntp start` on tk1
+- `./sync.sh` on tk2
+
+running:
+- `roscore` on tk1
+- `roslaunch avc tk1_teleop.launch` on tk1
+- `roslaunch avc tk2_teleop.launch` on tk2
+- `roslaunch avc tk1_sensors.launch` on tk1
+
+duplicate teleop launch file
+
+speed values are 0 to 2, I was driving at 0.4 or 0.5
+
+note - normalize input, denormalize output
+
+pip/ssl issues
+https://askubuntu.com/questions/254826/how-to-force-a-clock-update-using-ntp

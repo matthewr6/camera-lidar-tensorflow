@@ -89,7 +89,7 @@ with tf.Session() as sess:
 
     features, targets = batch(1000000)
     predictions = sess.run(pred, feed_dict={x: features})
-    x = [t[0]/(100) for t in targets]
+    x = [t[0]/(100) for t in targets] # remember the division by 100 for denormalization!
     y = [float(p[0])/100.0 for p in predictions]
 
     def bound(v):

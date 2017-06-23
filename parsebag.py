@@ -23,7 +23,7 @@ camera = {}
 
 TOPICS = {
     '/sensors/scan': 'laser',
-    '/sensors/usb_cam/image_raw': 'camera',
+    # '/sensors/usb_cam/image_raw': 'camera',
     '/vesc/ackermann_cmd_mux/input/teleop': 'drive',
 }
 

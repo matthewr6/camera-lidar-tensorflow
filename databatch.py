@@ -17,7 +17,8 @@ def flatten(data):
 print 'opening files'
 data = {}
 data['laser'] = flatten(open_file('normalized_data/laser'))
-data['ackermann'] = flatten(open_file('normalized_data/ackermann_v2'))
+data['ackermann'] = flatten(open_file('normalized_data/ackermann'))
+data['ackermann_cdf'] = flatten(open_file('normalized_data/ackermann_cdf'))
 print 'files opened'
 
 def next_x_values(arr, initial_idx, x=10):
@@ -32,8 +33,11 @@ def next_x_values(arr, initial_idx, x=10):
 max_batch_size = len(data['laser'])
 laser_length = 271
 laser_datapoints = float(max_batch_size)
-ackermann_datapoints = len(data['ackermann'])
-def batch(batch_size):
+def batch(batch_size, next_x=10, cdf=True):
+    ackermann_string = 'ackermann'
+    if cdf:
+        ackermann_string = 'ackermann_cdf'
+    ackermann_datapoints = len(data[ackermann_string])
     batch_size = min(max_batch_size, batch_size)
     targets = []
     features = []
@@ -45,7 +49,7 @@ def batch(batch_size):
 
         ackermann_idx = int(math.ceil(rel_idx * ackermann_datapoints))
 
-        next_values = next_x_values(data['ackermann'], ackermann_idx)
+        next_values = next_x_values(data[ackermann_string], ackermann_idx, x=next_x)
         ackermann_mean = np.average(next_values, weights=np.arange(1, len(next_values)+1)[::-1])
 
         targets.append([ackermann_mean])

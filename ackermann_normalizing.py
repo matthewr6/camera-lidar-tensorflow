@@ -44,6 +44,12 @@ def get_relatived_value(arr, rel_idx):
     return (v1 + v2).tolist()
 
 epsilon = 1e-9
+# def normalize(value):
+#     if value >= 1:
+#         value = 1-epsilon
+#     if value <= 0:
+#         value = epsilon
+#     return get_relatived_value(y, value)
 def denormalize(value):
     if value >= 1:
         value = 1-epsilon
@@ -53,8 +59,14 @@ def denormalize(value):
 
 if __name__ == '__main__':
     for time in original:
-      original[time] = [100.0*mapping[v] for v in original[time]]
-    with open('normalized_data/ackermann_v2.json', 'wb') as f:
+        original[time] = [100.0*mapping[v] for v in original[time]]
+    with open('normalized_data/ackermann_cdf.json', 'wb') as f:
+        json.dump(original, f)
+    with open('dict_data/ackermann.json', 'rb') as f:
+        original = json.load(f)
+    for time in original:
+        original[time] = [100.0*v for v in original[time]]
+    with open('normalized_data/ackermann.json', 'wb') as f:
         json.dump(original, f)
 
 # # thoughts
